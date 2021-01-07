@@ -10,11 +10,11 @@ const vendors = [
 ];
 
 const plugins = [
-    new uglifyPlugin({
+    /*new uglifyPlugin({
         parallel: true,
         cache: true,
         sourceMap: !isProd
-    })
+    })*/
 ];
 
 const webpackConfig = {

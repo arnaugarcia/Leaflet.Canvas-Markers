@@ -10,7 +10,28 @@ function layerFactory(L) {
             L.setOptions(this, options);
             this._onClickListeners = [];
             this._onHoverListeners = [];
+
+            // Spider
+            this.twoPi = Math.PI * 2;
             this._markersArray = [];
+            this.listeners = {};
+            this.circleFootSeparation = 25
+            this.keepSpiderfied = false;        // yes -> don't unspiderfy when a marker is selected
+            this.nearbyDistance = 20;           // spiderfy markers within this range of the one clicked, in px
+
+            this.circleSpiralSwitchover = 9;    // show spiral instead of circle from this marker count upwards
+            // 0 -> always spiral; Infinity -> always circle
+            this.circleFootSeparation = 25;     // related to circumference of circle
+            this.circleStartAngle = this.twoPi / 12;
+            this.spiralFootSeparation = 28;     // related to size of spiral (experiment!)
+            this.spiralLengthStart = 11;        // ditto
+            this.spiralLengthFactor = 5;        // ditto
+
+            this.legWeight = 1.5;
+            this.legColors = {
+                'usual': '#222',
+                'highlighted': '#f00'
+            };
         },
 
         setOptions: function (options) {
@@ -181,12 +202,111 @@ function layerFactory(L) {
                 }
             }
             if (nearbyMarkerData.length === 1) {  // 1 => the one clicked => none nearby
-                console.log('One marker');
-                return this.trigger('click', marker);
+                console.log('Marker alone');
+                //return this.trigger('click', marker);
             } else {
-                console.log('Multiple');
-                return this.spiderfy(nearbyMarkerData, nonNearbyMarkers);
+                return this._spiderfy(nearbyMarkerData, nonNearbyMarkers);
             }
+        },
+
+        _spiderfy: function (markerData, nonNearbyMarkers) {
+            let md;
+            console.log('Spiderfing', markerData);
+            this.spiderfying = true;
+            const numFeet = markerData.length;
+            const bodyPt = this.ptAverage((() => {
+                const result = [];
+                for (md of Array.from(markerData)) {
+                    result.push(md.markerPt);
+                }
+                return result;
+            })());
+            const footPts = numFeet >= this['circleSpiralSwitchover'] ?
+                this.generatePtsSpiral(numFeet, bodyPt).reverse()  // match from outside in => less cross-crossing
+                :
+                this._generatePtsCircle(numFeet, bodyPt);
+            const spiderfiedMarkers = (() => {
+                const result1 = [];
+                for (var footPt of Array.from(footPts)) {
+                    console.log(footPt);
+                    const footLl = map.layerPointToLatLng(footPt);
+                    const nearestMarkerDatum = this._minExtract(markerData, md => this._ptDistanceSq(md.markerPt, footPt));
+                    const {marker} = nearestMarkerDatum;
+                    const leg = new L.Polyline([marker.getLatLng(), footLl], {
+                        color: this.legColors.usual,
+                        weight: this.legWeight,
+                        clickable: false
+                    });
+                    map.addLayer(leg);
+                    marker.omsData = {usualPosition: marker.getLatLng(), leg};
+                    if (this.legColors.highlighted !== this.legColors.usual) {
+                        const mhl = this._makeHighlightListeners(marker);
+                        marker.omsData.highlightListeners = mhl;
+                        marker.addEventListener('mouseover', mhl.highlight);
+                        marker.addEventListener('mouseout', mhl.unhighlight);
+                    }
+                    marker.setLatLng(footLl);
+                    marker.setZIndexOffset(1000000);
+                    result1.push(marker);
+                }
+                return result1;
+            })();
+            delete this.spiderfying;
+            this.spiderfied = true;
+            return this.trigger('spiderfy', spiderfiedMarkers, nonNearbyMarkers);
+        },
+
+        _makeHighlightListeners: function (marker) {
+            return {
+                highlight: () => marker.omsData.leg.setStyle({color: this.legColors.highlighted}),
+                unhighlight: () => marker.omsData.leg.setStyle({color: this.legColors.usual})
+            };
+        },
+
+        _generatePtsCircle: function (count, centerPt) {
+            const twoPi = Math.PI * 2;
+            const circumference = this.circleFootSeparation * (2 + count);
+            const legLength = circumference / twoPi;  // = radius from circumference
+            const angleStep = twoPi / count;
+            return (() => {
+                const result = [];
+                for (let i = 0, end = count, asc = 0 <= end; asc ? i < end : i > end; asc ? i++ : i--) {
+                    const angle = this.circleStartAngle + (i * angleStep);
+                    result.push(new L.Point(centerPt.x + (legLength * Math.cos(angle)),
+                        centerPt.y + (legLength * Math.sin(angle))));
+                }
+                return result;
+            })();
+        },
+
+        _ptDistanceSq: function (pt1, pt2) {
+            const dx = pt1.x - pt2.x;
+            const dy = pt1.y - pt2.y;
+            return (dx * dx) + (dy * dy);
+        },
+
+        _ptAverage: function (pts) {
+            let sumY;
+            let sumX = (sumY = 0);
+            for (let pt of Array.from(pts)) {
+                sumX += pt.x;
+                sumY += pt.y;
+            }
+            const numPts = pts.length;
+            return new L.Point(sumX / numPts, sumY / numPts);
+        },
+
+        _minExtract: function (set, func) {  // destructive! returns minimum, and also removes it from the set
+            let bestIndex;
+            for (let index = 0; index < set.length; index++) {
+                const item = set[index];
+                const val = func(item);
+                if ((bestIndex == null) || (val < bestVal)) {
+                    var bestVal = val;
+                    bestIndex = index;
+                }
+            }
+            return set.splice(bestIndex, 1)[0];
         },
 
         _addMarker: function (marker, latlng, isDisplaying) {
@@ -282,6 +402,10 @@ function layerFactory(L) {
                     }
                 }
             }
+        },
+
+        _trigger: function (event, ...args) {
+            return (Array.from(this.listeners[event] != null ? this.listeners[event] : [])).map((func) => func(...Array.from(args || [])));
         },
 
         _drawImage: function (marker, pointPos) {
