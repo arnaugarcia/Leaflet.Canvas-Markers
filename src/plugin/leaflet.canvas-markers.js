@@ -221,8 +221,8 @@ function layerFactory(L) {
                 }
                 return result;
             })());
-            const footPts = numFeet >= this['circleSpiralSwitchover'] ?
-                this.generatePtsSpiral(numFeet, bodyPt).reverse()  // match from outside in => less cross-crossing
+            const footPts = numFeet >= this.circleSpiralSwitchover ?
+                this._generatePtsSpiral(numFeet, bodyPt).reverse()  // match from outside in => less cross-crossing
                 :
                 this._generatePtsCircle(numFeet, bodyPt);
             const spiderfiedMarkers = (() => {
@@ -255,6 +255,22 @@ function layerFactory(L) {
             delete this.spiderfying;
             this.spiderfied = true;
             return this._trigger('spiderfy', spiderfiedMarkers, nonNearbyMarkers);
+        },
+
+        _generatePtsSpiral: function (count, centerPt) {
+            let legLength = this.spiralLengthStart;
+            let angle = 0;
+            return (() => {
+                const result = [];
+                for (let i = 0, end = count, asc = 0 <= end; asc ? i < end : i > end; asc ? i++ : i--) {
+                    angle += (this.spiralFootSeparation / legLength) + (i * 0.0005);
+                    const pt = new L.Point(centerPt.x + (legLength * Math.cos(angle)),
+                        centerPt.y + (legLength * Math.sin(angle)));
+                    legLength += (this.twoPi * this.spiralLengthFactor) / angle;
+                    result.push(pt);
+                }
+                return result;
+            })();
         },
 
         _makeHighlightListeners: function (marker) {
