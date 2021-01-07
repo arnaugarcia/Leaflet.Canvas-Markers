@@ -226,9 +226,8 @@ function layerFactory(L) {
                 :
                 this._generatePtsCircle(numFeet, bodyPt);
             const spiderfiedMarkers = (() => {
-                const result1 = [];
+                const result = [];
                 for (var footPt of Array.from(footPts)) {
-                    console.log(footPt);
                     const footLl = map.layerPointToLatLng(footPt);
                     const nearestMarkerDatum = this._minExtract(markerData, md => this._ptDistanceSq(md.markerPt, footPt));
                     const {marker} = nearestMarkerDatum;
@@ -245,15 +244,17 @@ function layerFactory(L) {
                         marker.addEventListener('mouseover', mhl.highlight);
                         marker.addEventListener('mouseout', mhl.unhighlight);
                     }
+                    this.removeLayer(marker);
                     marker.setLatLng(footLl);
-                    marker.setZIndexOffset(1000000);
-                    result1.push(marker);
+                    //marker.setZIndexOffset(1000000);
+                    this.addMarker(marker);
+                    result.push(marker);
                 }
-                return result1;
+                return result;
             })();
             delete this.spiderfying;
             this.spiderfied = true;
-            return this.trigger('spiderfy', spiderfiedMarkers, nonNearbyMarkers);
+            return this._trigger('spiderfy', spiderfiedMarkers, nonNearbyMarkers);
         },
 
         _makeHighlightListeners: function (marker) {
