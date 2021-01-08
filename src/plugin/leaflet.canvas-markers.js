@@ -258,17 +258,20 @@ function layerFactory(L) {
         },
 
         unspiderfy: function (markerNotToMove = null) {
+            console.log('Unspiderfy');
             if (this.spiderfied == null) {
                 return this;
             }
             this.unspiderfying = true;
             const unspiderfiedMarkers = [];
             const nonNearbyMarkers = [];
-            for (let marker of Array.from(this.markers)) {
+            for (let marker of Array.from(this._markersArray)) {
                 if (marker.omsData != null) {
                     map.removeLayer(marker.omsData.leg);
                     if (marker !== markerNotToMove) {
+                        this.removeMarker(marker);
                         marker.setLatLng(marker.omsData.usualPosition);
+                        this.addMarker(marker);
                     }
                     marker.setZIndexOffset(0);
                     const mhl = marker.omsData.highlightListeners;
@@ -284,7 +287,7 @@ function layerFactory(L) {
             }
             delete this.unspiderfying;
             delete this.spiderfied;
-            this.trigger('unspiderfy', unspiderfiedMarkers, nonNearbyMarkers);
+            //this.trigger('unspiderfy', unspiderfiedMarkers, nonNearbyMarkers);
             return this;  // return self, for chaining
         },
 
