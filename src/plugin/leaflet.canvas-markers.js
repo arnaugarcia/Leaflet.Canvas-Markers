@@ -257,6 +257,37 @@ function layerFactory(L) {
             return this._trigger('spiderfy', spiderfiedMarkers, nonNearbyMarkers);
         },
 
+        unspiderfy: function (markerNotToMove = null) {
+            if (this.spiderfied == null) {
+                return this;
+            }
+            this.unspiderfying = true;
+            const unspiderfiedMarkers = [];
+            const nonNearbyMarkers = [];
+            for (let marker of Array.from(this.markers)) {
+                if (marker.omsData != null) {
+                    map.removeLayer(marker.omsData.leg);
+                    if (marker !== markerNotToMove) {
+                        marker.setLatLng(marker.omsData.usualPosition);
+                    }
+                    marker.setZIndexOffset(0);
+                    const mhl = marker.omsData.highlightListeners;
+                    if (mhl != null) {
+                        marker.removeEventListener('mouseover', mhl.highlight);
+                        marker.removeEventListener('mouseout', mhl.unhighlight);
+                    }
+                    delete marker.omsData;
+                    unspiderfiedMarkers.push(marker);
+                } else {
+                    nonNearbyMarkers.push(marker);
+                }
+            }
+            delete this.unspiderfying;
+            delete this.spiderfied;
+            this.trigger('unspiderfy', unspiderfiedMarkers, nonNearbyMarkers);
+            return this;  // return self, for chaining
+        },
+
         _generatePtsSpiral: function (count, centerPt) {
             let legLength = this.spiralLengthStart;
             let angle = 0;
