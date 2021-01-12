@@ -269,13 +269,13 @@ function layerFactory(L) {
                 return this;
             }
             this.unspiderfying = true;
-            const unspiderfiedMarkers = [];
-            const nonNearbyMarkers = [];
+            //const unspiderfiedMarkers = [];
+            //const nonNearbyMarkers = [];
             for (let marker of Array.from(this._markersArray)) {
                 if (marker.omsData != null) {
                     map.removeLayer(marker.omsData.leg);
                     if (marker !== markerNotToMove) {
-                        this.removeMarker(marker);
+                        this.removeLayer(marker);
                         marker.setLatLng(marker.omsData.usualPosition);
                         this.addMarker(marker);
                     }
@@ -286,15 +286,50 @@ function layerFactory(L) {
                         marker.removeEventListener('mouseout', mhl.unhighlight);
                     }
                     delete marker.omsData;
-                    unspiderfiedMarkers.push(marker);
+                    //unspiderfiedMarkers.push(marker);
                 } else {
-                    nonNearbyMarkers.push(marker);
+                    //nonNearbyMarkers.push(marker);
                 }
             }
             delete this.unspiderfying;
             delete this.spiderfied;
             //this.trigger('unspiderfy', unspiderfiedMarkers, nonNearbyMarkers);
             return this;  // return self, for chaining
+        },
+
+
+        spiderListener: function (marker) {
+            console.log(marker.latlng);
+            const markerSpiderfied = (marker._omsData != null);
+            if (!markerSpiderfied || !this.keepSpiderfied) {
+                this.unspiderfy()
+            }
+            if (markerSpiderfied) {
+                return this.trigger('click', marker);
+            } else {
+                const nearbyMarkerData = [];
+                const nonNearbyMarkers = [];
+                const pxSq = this.nearbyDistance * this.nearbyDistance;
+                const markerPt = map.latLngToLayerPoint(marker.latlng);
+                for (let m of Array.from(this._markersArray)) {
+                    /*if (!map.hasLayer(m)) {
+                        continue;
+                    }*/
+                    const mPt = map.latLngToLayerPoint(m.getLatLng());
+                    if (this.ptDistanceSq(mPt, markerPt) < pxSq) {
+                        nearbyMarkerData.push({marker: m, markerPt: mPt});
+                    } else {
+                        nonNearbyMarkers.push(m);
+                    }
+                }
+                if (nearbyMarkerData.length === 1) {  // 1 => the one clicked => none nearby
+                    console.log('Marker clicked');
+                    return this;
+                    //return this.trigger('click', marker);
+                } else {
+                    return this._spiderfy(nearbyMarkerData, nonNearbyMarkers);
+                }
+            }
         },
 
         _generatePtsSpiral: function (count, centerPt) {

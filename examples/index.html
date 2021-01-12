@@ -5,76 +5,79 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Test</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
   <style>
-    body{
+    body {
       font-family: Arial, Helvetica, sans-serif;
     }
-    .container{
+
+    .container {
       margin: 0 auto;
       max-width: 1200px;
     }
-    .map{
+
+    .map {
       width: 100%;
       height: 600px;
     }
-    .header{
+
+    .header {
       padding-top: 50px;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <h1>Leaflet.canvas-icons</h1>
-      <p>Leaflet plugin for displaying markers on canvas instead of DOM.</p>
-    </div>
-    <div class="map" id="map"></div>
+<div class="container">
+  <div class="header">
+    <h1>Leaflet.canvas-icons</h1>
+    <p>Leaflet plugin for displaying markers on canvas instead of DOM.</p>
   </div>
-  <script src="../dist/leaflet.canvas-markers.js"></script>
-  <!--<script src="../src/plugin/leaflet.oms.js"></script>-->
-  <script>
-    var map = L.map('map').setView([59.9578,30.2987], 10);
-    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-      preferCanvas: true
-    }).addTo(map);
+  <div class="map" id="map"></div>
+</div>
+<script src="../dist/leaflet.canvas-markers.js"></script>
+<!--<script src="../src/plugin/leaflet.oms.js"></script>-->
+<script>
+  var map = L.map('map').setView([59.9578, 30.2987], 10);
+  L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+    preferCanvas: true
+  }).addTo(map);
 
 
-    var ciLayer = L.canvasIconLayer({}).addTo(map);
+  var ciLayer = L.canvasIconLayer({}).addTo(map);
 
-    //var oms = new OverlappingMarkerSpiderfier(map, ciLayer);
+  //var oms = new OverlappingMarkerSpiderfier(map, ciLayer);
 
-    ciLayer.addOnClickListener((e,data) => {
-      ciLayer.spiderfy(e);
-    });
+  ciLayer.addOnClickListener((e, data) => {
+    ciLayer.spiderListener(e);
+  });
 
-    map.on('zoomend moveend', function (event) {
-      ciLayer.unspiderfy();
-    });
+  map.on('zoomend moveend', function (event) {
+    ciLayer.unspiderfy();
+  });
 
-    //ciLayer.addOnHoverListener(function (e,data) {console.log(data[0].data._leaflet_id)});
+  //ciLayer.addOnHoverListener(function (e,data) {console.log(data[0].data._leaflet_id)});
 
-    var icon = L.icon({
-      iconUrl: 'img/pothole.png',
-      iconSize: [20, 18],
-      iconAnchor: [10, 9]
-    });
+  var icon = L.icon({
+    iconUrl: 'img/pothole.png',
+    iconSize: [20, 18],
+    iconAnchor: [10, 9]
+  });
 
   var markers = [];
-    for (var i = 0; i < 100; i++) {
-      //var marker = L.marker([58.5578 + Math.random()*1.8, 29.0087 + Math.random()*3.6], {icon: icon}).bindPopup("I Am "+i);
-      const marker = L.marker([58.5578 + Math.random()*1.8, 29.0087 + Math.random()*3.6], {icon: icon});
-      //map.addLayer(marker);
-      markers.push(marker);
-      ciLayer.addMarker(marker);
-      //oms.addMarker(marker);
-    }
-    // ciLayer.addLayers(markers);
+  for (var i = 0; i < 100; i++) {
+    //var marker = L.marker([58.5578 + Math.random()*1.8, 29.0087 + Math.random()*3.6], {icon: icon}).bindPopup("I Am "+i);
+    const marker = L.marker([58.5578 + Math.random() * 1.8, 29.0087 + Math.random() * 3.6], {icon: icon});
+    //map.addLayer(marker);
+    markers.push(marker);
+    ciLayer.addMarker(marker);
+    //oms.addMarker(marker);
+  }
+  // ciLayer.addLayers(markers);
 
-    window.map = map;
+  window.map = map;
 
-  </script>
+</script>
 </body>
 </html>
