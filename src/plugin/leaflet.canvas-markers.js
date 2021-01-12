@@ -131,6 +131,12 @@ function layerFactory(L) {
                 return a.data._leaflet_id === b.data._leaflet_id;
             });
 
+            const index = this._markersArray.indexOf(marker);
+
+            if (index > -1) {
+                this._markersArray.splice(index, 1);
+            }
+
             self._latlngMarkers.total--;
             self._latlngMarkers.dirty++;
 
@@ -309,8 +315,8 @@ function layerFactory(L) {
 
         _makeHighlightListeners: function (marker) {
             return {
-                highlight: () => marker.omsData.leg.setStyle({color: this.legColors.highlighted}),
-                unhighlight: () => marker.omsData.leg.setStyle({color: this.legColors.usual})
+                highlight: () => marker.omsData.leg.setStyle({color: this.legColors.highlighted}).bringToBack(),
+                unhighlight: () => marker.omsData.leg.setStyle({color: this.legColors.usual}).bringToBack()
             };
         },
 
