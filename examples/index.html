@@ -49,6 +49,10 @@
     ciLayer.addOnClickListener((e,data) => {
       ciLayer.spiderfy(e);
     });
+
+    map.on('zoomend moveend', function (event) {
+      ciLayer.unspiderfy();
+    });
     //ciLayer.addOnHoverListener(function (e,data) {console.log(data[0].data._leaflet_id)});
 
     var icon = L.icon({
