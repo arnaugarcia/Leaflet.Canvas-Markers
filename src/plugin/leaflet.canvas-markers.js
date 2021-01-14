@@ -299,7 +299,6 @@ function layerFactory(L) {
 
 
         spiderListener: function (marker) {
-            console.log(marker.latlng);
             const markerSpiderfied = (marker._omsData != null);
             if (!markerSpiderfied || !this.keepSpiderfied) {
                 this.unspiderfy()

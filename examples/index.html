@@ -65,12 +65,10 @@
     iconAnchor: [10, 9]
   });
 
-  var markers = [];
   for (var i = 0; i < 100; i++) {
     //var marker = L.marker([58.5578 + Math.random()*1.8, 29.0087 + Math.random()*3.6], {icon: icon}).bindPopup("I Am "+i);
     const marker = L.marker([58.5578 + Math.random() * 1.8, 29.0087 + Math.random() * 3.6], {icon: icon});
     //map.addLayer(marker);
-    markers.push(marker);
     ciLayer.addMarker(marker);
     //oms.addMarker(marker);
   }
