@@ -305,7 +305,7 @@ function layerFactory(L) {
                 this.unspiderfy()
             }
             if (markerSpiderfied) {
-                return this.trigger('click', marker);
+                return this._trigger('click', marker);
             } else {
                 const nearbyMarkerData = [];
                 const nonNearbyMarkers = [];
@@ -323,9 +323,7 @@ function layerFactory(L) {
                     }
                 }
                 if (nearbyMarkerData.length === 1) {  // 1 => the one clicked => none nearby
-                    console.log('Marker clicked');
-                    return this;
-                    //return this.trigger('click', marker);
+                    return this._trigger('click', marker);
                 } else {
                     return this._spiderfy(nearbyMarkerData, nonNearbyMarkers);
                 }
