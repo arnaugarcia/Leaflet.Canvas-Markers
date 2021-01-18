@@ -242,7 +242,7 @@ function layerFactory(L) {
                         weight: this.legWeight,
                         clickable: false
                     });
-                    map.addLayer(leg);
+                    //map.addLayer(leg);
                     marker.omsData = {usualPosition: marker.getLatLng(), leg};
                     if (this.legColors.highlighted !== this.legColors.usual) {
                         const mhl = this._makeHighlightListeners(marker);
@@ -310,6 +310,7 @@ function layerFactory(L) {
                 const nonNearbyMarkers = [];
                 const pxSq = this.nearbyDistance * this.nearbyDistance;
                 const markerPt = map.latLngToLayerPoint(marker.latlng);
+                console.log(markerPt);
                 for (let m of Array.from(this._markersArray)) {
                     /*if (!map.hasLayer(m)) {
                         continue;
