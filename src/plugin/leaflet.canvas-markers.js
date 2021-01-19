@@ -9,6 +9,7 @@ function layerFactory(L) {
 
             L.setOptions(this, options);
             this._onClickListeners = [];
+            this._processAllOnClickListeners = true;
             this._onHoverListeners = [];
 
             // Spider
@@ -212,6 +213,7 @@ function layerFactory(L) {
                 //return this.trigger('click', marker);
             } else {
                 return this._spiderfy(nearbyMarkerData, nonNearbyMarkers);
+
             }
         },
 
@@ -322,9 +324,12 @@ function layerFactory(L) {
                         nonNearbyMarkers.push(m);
                     }
                 }
-                if (nearbyMarkerData.length === 1) {  // 1 => the one clicked => none nearby
+                if (nearbyMarkerData.length === 0) {  // 0 => one spidered marker clicked => none nearby
+                    return this._trigger('click', marker);
+                } else if (nearbyMarkerData.length === 1) {  // 1 => the one clicked => none nearby
                     return this._trigger('click', marker);
                 } else {
+                    this._cancelClick();
                     return this._spiderfy(nearbyMarkerData, nonNearbyMarkers);
                 }
             }
@@ -495,7 +500,11 @@ function layerFactory(L) {
         },
 
         _trigger: function (event, ...args) {
-            return (Array.from(this.listeners[event] != null ? this.listeners[event] : [])).map((func) => func(...Array.from(args || [])));
+            // return (Array.from(this.listeners[event] != null ? this.listeners[event] : [])).map((func) => func(...Array.from(args || [])));
+        },
+
+        _cancelClick: function (event, ...args) {
+            this._processAllOnClickListeners = false;
         },
 
         _drawImage: function (marker, pointPos) {
@@ -636,8 +645,9 @@ function layerFactory(L) {
                     if (hasPopup) ret[0].data.openPopup();
 
                     me._onClickListeners.forEach(function (listener) {
-                        listener(event, ret);
+                        if (me._processAllOnClickListeners) listener(event, ret);
                     });
+                    me._processAllOnClickListeners = true;
                 }
 
                 if (event.type === "mousemove") {
