@@ -325,7 +325,7 @@ function layerFactory(L) {
                 } else if (nearbyMarkerData.length === 1) {  // 1 => the one clicked => none nearby
                     return this._trigger('click', marker);
                 } else {
-                    this._cancelClick();
+                    marker.closePopup();
                     return this._spiderfy(nearbyMarkerData, nonNearbyMarkers);
                 }
             }
