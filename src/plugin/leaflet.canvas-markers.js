@@ -298,7 +298,6 @@ function layerFactory(L) {
         },
 
         spiderListener: function (marker) {
-            console.log(marker);
             const markerSpiderfied = (marker._omsData != null);
             if (!markerSpiderfied || !this.keepSpiderfied) {
                 this.unspiderfy()
@@ -405,8 +404,6 @@ function layerFactory(L) {
         },
 
         _addMarker: function (marker, latlng, isDisplaying) {
-
-            console.log(marker.omsData);
 
             var self = this;
             //Needed for pop-up & tooltip to work.
