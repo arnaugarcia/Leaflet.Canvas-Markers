@@ -51,16 +51,18 @@
 
 //  ciLayer.addOnClickListener(function (e,data) {console.log(data)});
 
-
   ciLayer.addOnClickListener((e, data) => {
-    ciLayer.spiderListener(e);
+    console.log('Spider listener');
+    const marker = data[0].data;
+    ciLayer.spiderListener(marker);
   });
 
-  var popup = new L.Popup({closeButton: false, offset: new L.Point(0.5, -24)});
+  var popup = new L.Popup({closeButton: false});
   ciLayer.addOnClickListener(function (e, data) {
-
+    const marker = data[0].data;
+    console.log('Popup listener');
     popup.setContent("Descripció Marker");
-    popup.setLatLng(e.latlng);
+    popup.setLatLng(marker.getLatLng());
     map.openPopup(popup);
   });
 

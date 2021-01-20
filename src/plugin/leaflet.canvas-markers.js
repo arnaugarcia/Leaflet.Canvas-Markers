@@ -193,7 +193,7 @@ function layerFactory(L) {
             const nearbyDistance = 20;
             const pxSq = nearbyDistance * nearbyDistance;
 
-            const markerPt = map.latLngToLayerPoint(marker.latlng);
+            const markerPt = map.latLngToLayerPoint(marker.getLatLng());
 
             for (let m of this._markersArray) {
                 /*if (!map.hasLayer(m)) {
@@ -219,7 +219,6 @@ function layerFactory(L) {
 
         _spiderfy: function (markerData, nonNearbyMarkers) {
             let md;
-            console.log('Spiderfing', markerData);
             this.spiderfying = true;
             const numFeet = markerData.length;
             const bodyPt = this.ptAverage((() => {
@@ -266,7 +265,6 @@ function layerFactory(L) {
         },
 
         unspiderfy: function (markerNotToMove = null) {
-            console.log('Unspiderfy');
             if (this.spiderfied == null) {
                 return this;
             }
@@ -299,20 +297,20 @@ function layerFactory(L) {
             return this;  // return self, for chaining
         },
 
-
         spiderListener: function (marker) {
+            console.log(marker);
             const markerSpiderfied = (marker._omsData != null);
             if (!markerSpiderfied || !this.keepSpiderfied) {
                 this.unspiderfy()
             }
             if (markerSpiderfied) {
+                console.log('markers spiderfied');
                 return this._trigger('click', marker);
             } else {
                 const nearbyMarkerData = [];
                 const nonNearbyMarkers = [];
                 const pxSq = this.nearbyDistance * this.nearbyDistance;
-                const markerPt = map.latLngToLayerPoint(marker.latlng);
-                console.log(markerPt);
+                const markerPt = map.latLngToLayerPoint(marker.getLatLng());
                 for (let m of Array.from(this._markersArray)) {
                     /*if (!map.hasLayer(m)) {
                         continue;
@@ -326,8 +324,10 @@ function layerFactory(L) {
                 }
                 if (nearbyMarkerData.length === 0) {  // 0 => one spidered marker clicked => none nearby
                     return this._trigger('click', marker);
+                    console.log('spidered marker clicked');
                 } else if (nearbyMarkerData.length === 1) {  // 1 => the one clicked => none nearby
                     return this._trigger('click', marker);
+                    console.log('the one clicked (non nearby)');
                 } else {
                     this._cancelClick();
                     return this._spiderfy(nearbyMarkerData, nonNearbyMarkers);
@@ -405,6 +405,8 @@ function layerFactory(L) {
         },
 
         _addMarker: function (marker, latlng, isDisplaying) {
+
+            console.log(marker.omsData);
 
             var self = this;
             //Needed for pop-up & tooltip to work.
