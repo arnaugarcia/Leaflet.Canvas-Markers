@@ -55,8 +55,6 @@ function layerFactory(L) {
 
             self._markersArray.push(...markers);
 
-            console.log(self._markersArray);
-
             markers.forEach(function (marker) {
 
                 if (!((marker.options.pane == 'markerPane') && marker.options.icon)) {
