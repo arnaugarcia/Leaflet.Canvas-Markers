@@ -49,19 +49,10 @@
 
   //var oms = new OverlappingMarkerSpiderfier(map, ciLayer);
 
-//  ciLayer.addOnClickListener(function (e,data) {console.log(data)});
 
   ciLayer.addOnClickListener((e, data) => {
     const marker = data[0].data;
     ciLayer.spiderListener(marker);
-  });
-
-  var popup = new L.Popup({closeButton: false});
-  ciLayer.addOnClickListener(function (e, data) {
-    const marker = data[0].data;
-    popup.setContent("Descripció Marker");
-    popup.setLatLng(marker.getLatLng());
-    map.openPopup(popup);
   });
 
   map.on('zoomend moveend', function (event) {
@@ -76,25 +67,11 @@
     iconAnchor: [10, 9]
   });
 
-  function markerOnClick(e) {
-    var attributes = e.layer.properties;
-    console.log(attributes.name, attributes.desctiption, attributes.othervars);
-    // do some stuff…
-  }
-
   for (var i = 0; i < 100; i++) {
-    //var marker = L.marker([58.5578 + Math.random()*1.8, 29.0087 + Math.random()*3.6], {icon: icon}).bindPopup("I Am "+i);
-    const marker = L.marker([58.5578 + Math.random() * 1.8, 29.0087 + Math.random() * 3.6], {icon: icon});
-    //map.addLayer(marker);
+    const marker = L.marker([58.5578 + Math.random() * 1.8, 29.0087 + Math.random() * 3.6], {icon: icon}).bindPopup("I Am "+i);
 
-    //marker.on('click',markerOnClick);
     ciLayer.addMarker(marker);
-    //oms.addMarker(marker);
   }
-  // ciLayer.addLayers(markers);
-
-  //ciLayer.on("click", markerOnClick);
-
 
   window.map = map;
 

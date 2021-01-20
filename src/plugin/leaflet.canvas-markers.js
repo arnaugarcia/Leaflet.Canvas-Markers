@@ -210,7 +210,7 @@ function layerFactory(L) {
             }
             if (nearbyMarkerData.length === 1) {  // 1 => the one clicked => none nearby
                 console.log('Marker alone');
-                //return this.trigger('click', marker);
+                return this._trigger('click', marker);
             } else {
                 return this._spiderfy(nearbyMarkerData, nonNearbyMarkers);
 
@@ -298,12 +298,11 @@ function layerFactory(L) {
         },
 
         spiderListener: function (marker) {
-            const markerSpiderfied = (marker._omsData != null);
+            const markerSpiderfied = (marker.omsData != null);
             if (!markerSpiderfied || !this.keepSpiderfied) {
                 this.unspiderfy()
             }
             if (markerSpiderfied) {
-                console.log('markers spiderfied');
                 return this._trigger('click', marker);
             } else {
                 const nearbyMarkerData = [];
@@ -323,10 +322,8 @@ function layerFactory(L) {
                 }
                 if (nearbyMarkerData.length === 0) {  // 0 => one spidered marker clicked => none nearby
                     return this._trigger('click', marker);
-                    console.log('spidered marker clicked');
                 } else if (nearbyMarkerData.length === 1) {  // 1 => the one clicked => none nearby
                     return this._trigger('click', marker);
-                    console.log('the one clicked (non nearby)');
                 } else {
                     this._cancelClick();
                     return this._spiderfy(nearbyMarkerData, nonNearbyMarkers);
