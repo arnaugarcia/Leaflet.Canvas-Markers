@@ -53,6 +53,10 @@ function layerFactory(L) {
             var tmpMark = [];
             var tmpLatLng = [];
 
+            self._markersArray.push(...markers);
+
+            console.log(self._markersArray);
+
             markers.forEach(function (marker) {
 
                 if (!((marker.options.pane == 'markerPane') && marker.options.icon)) {
@@ -501,10 +505,6 @@ function layerFactory(L) {
 
         _trigger: function (event, ...args) {
             // return (Array.from(this.listeners[event] != null ? this.listeners[event] : [])).map((func) => func(...Array.from(args || [])));
-        },
-
-        _cancelClick: function (event, ...args) {
-            this._processAllOnClickListeners = false;
         },
 
         _drawImage: function (marker, pointPos) {

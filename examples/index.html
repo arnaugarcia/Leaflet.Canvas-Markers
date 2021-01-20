@@ -47,9 +47,6 @@
 
   var ciLayer = L.canvasIconLayer({}).addTo(map);
 
-  //var oms = new OverlappingMarkerSpiderfier(map, ciLayer);
-
-
   ciLayer.addOnClickListener((e, data) => {
     const marker = data[0].data;
     ciLayer.spiderListener(marker);
@@ -59,7 +56,7 @@
     ciLayer.unspiderfy();
   });
 
-  //ciLayer.addOnHoverListener(function (e,data) {console.log(data[0].data._leaflet_id)});
+  // ciLayer.addOnHoverListener(function (e,data) {console.log(data[0].data._leaflet_id)});
 
   var icon = L.icon({
     iconUrl: 'img/pothole.png',
@@ -67,11 +64,14 @@
     iconAnchor: [10, 9]
   });
 
+  let markers = [];
   for (var i = 0; i < 100; i++) {
     const marker = L.marker([58.5578 + Math.random() * 1.8, 29.0087 + Math.random() * 3.6], {icon: icon}).bindPopup("I Am "+i);
-
-    ciLayer.addMarker(marker);
+    markers.push(marker);
+    //ciLayer.addMarker(marker);
   }
+
+  ciLayer.addMarkers(markers);
 
   window.map = map;
 
