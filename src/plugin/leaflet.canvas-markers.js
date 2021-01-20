@@ -293,8 +293,12 @@ function layerFactory(L) {
             }
             delete this.unspiderfying;
             delete this.spiderfied;
-            //this.trigger('unspiderfy', unspiderfiedMarkers, nonNearbyMarkers);
+            // this._trigger('unspiderfy', unspiderfiedMarkers, nonNearbyMarkers);
             return this;  // return self, for chaining
+        },
+
+        _closePopup: function (marker) {
+            marker.closePopup();
         },
 
         spiderListener: function (marker) {
@@ -325,7 +329,7 @@ function layerFactory(L) {
                 } else if (nearbyMarkerData.length === 1) {  // 1 => the one clicked => none nearby
                     return this._trigger('click', marker);
                 } else {
-                    marker.closePopup();
+                    this._closePopup(marker);
                     return this._spiderfy(nearbyMarkerData, nonNearbyMarkers);
                 }
             }
