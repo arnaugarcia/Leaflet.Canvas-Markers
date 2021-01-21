@@ -51,7 +51,6 @@
     const marker = data[0].data;
     ciLayer.spiderListener(marker);
   });
-
   map.on('zoomend moveend', function (event) {
     ciLayer.unspiderfy();
   });
@@ -68,7 +67,6 @@
   for (var i = 0; i < 100; i++) {
     const marker = L.marker([58.5578 + Math.random() * 1.8, 29.0087 + Math.random() * 3.6], {icon: icon}).bindPopup("I Am "+i);
     markers.push(marker);
-    //ciLayer.addMarker(marker);
   }
 
   ciLayer.addMarkers(markers);
