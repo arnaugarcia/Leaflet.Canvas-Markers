@@ -9,7 +9,6 @@ function layerFactory(L) {
 
             L.setOptions(this, options);
             this._onClickListeners = [];
-            this._processAllOnClickListeners = true;
             this._onHoverListeners = [];
 
             // Spider
@@ -78,11 +77,18 @@ function layerFactory(L) {
 
         //Adds single layer at a time. Less efficient for rBush
         addMarker: function (marker) {
+            const self = this;
 
-            var self = this;
-            var latlng = marker.getLatLng();
-            var isDisplaying = self._map.getBounds().contains(latlng);
-            var dat = self._addMarker(marker, latlng, isDisplaying);
+            const markerListener = () => {
+                console.log('Marker clicked');
+                this.spiderListener(marker);
+            }
+
+            marker.addEventListener('click', markerListener);
+
+            const coordinate = marker.getLatLng();
+            const isDisplaying = self._map.getBounds().contains(coordinate);
+            const dat = self._addMarker(marker, coordinate, isDisplaying);
 
             self._markersArray.push(marker);
 
@@ -90,6 +96,8 @@ function layerFactory(L) {
             if (isDisplaying === true) self._markers.insert(dat[0]);
 
             self._latlngMarkers.insert(dat[1]);
+
+
         },
 
         addLayer: function (layer) {
@@ -162,7 +170,7 @@ function layerFactory(L) {
             map.on('resize', this._reset, this);
 
             map.on('click', this._executeListeners, this);
-            map.on('mousemove', this._executeListeners, this);
+            //map.on('mousemove', this._executeListeners, this);
         },
 
         onRemove: function (map) {
@@ -171,7 +179,7 @@ function layerFactory(L) {
             else map.getPanes().overlayPane.removeChild(this._canvas);
 
             map.off('click', this._executeListeners, this);
-            map.off('mousemove', this._executeListeners, this);
+            //map.off('mousemove', this._executeListeners, this);
 
             map.off('moveend', this._reset, this);
             map.off('resize', this._reset, this);
@@ -204,15 +212,16 @@ function layerFactory(L) {
                 }*/
                 const mPt = map.latLngToLayerPoint(m.getLatLng());
 
-                if (ciLayer.ptDistanceSq(mPt, markerPt) < pxSq) {
+                if (canvasLayer.ptDistanceSq(mPt, markerPt) < pxSq) {
                     nearbyMarkerData.push({marker: m, markerPt: mPt});
                 } else {
                     nonNearbyMarkers.push(m);
                 }
             }
             if (nearbyMarkerData.length === 1) {  // 1 => the one clicked => none nearby
-                console.log('Marker alone');
-                return this._trigger('click', marker);
+                console.log('Marker Alone');
+                this._trigger('popup', marker);
+                //return this._trigger('click', marker);
             } else {
                 return this._spiderfy(nearbyMarkerData, nonNearbyMarkers);
 
@@ -271,8 +280,8 @@ function layerFactory(L) {
                 return this;
             }
             this.unspiderfying = true;
-            //const unspiderfiedMarkers = [];
-            //const nonNearbyMarkers = [];
+            const unspiderfiedMarkers = [];
+            const nonNearbyMarkers = [];
             for (let marker of Array.from(this._markersArray)) {
                 if (marker.omsData != null) {
                     map.removeLayer(marker.omsData.leg);
@@ -288,14 +297,14 @@ function layerFactory(L) {
                         marker.removeEventListener('mouseout', mhl.unhighlight);
                     }
                     delete marker.omsData;
-                    //unspiderfiedMarkers.push(marker);
+                    unspiderfiedMarkers.push(marker);
                 } else {
-                    //nonNearbyMarkers.push(marker);
+                    nonNearbyMarkers.push(marker);
                 }
             }
             delete this.unspiderfying;
             delete this.spiderfied;
-            // this._trigger('unspiderfy', unspiderfiedMarkers, nonNearbyMarkers);
+            this._trigger('unspiderfy', unspiderfiedMarkers, nonNearbyMarkers);
             return this;  // return self, for chaining
         },
 
@@ -337,6 +346,11 @@ function layerFactory(L) {
             }
         },
 
+        addListener: function (event, func) {
+            (this.listeners[event] != null ? this.listeners[event] : (this.listeners[event] = [])).push(func);
+            return this;  // return self, for chaining
+        },
+
         _generatePtsSpiral: function (count, centerPt) {
             let legLength = this.spiralLengthStart;
             let angle = 0;
@@ -344,8 +358,7 @@ function layerFactory(L) {
                 const result = [];
                 for (let i = 0, end = count, asc = 0 <= end; asc ? i < end : i > end; asc ? i++ : i--) {
                     angle += (this.spiralFootSeparation / legLength) + (i * 0.0005);
-                    const pt = new L.Point(centerPt.x + (legLength * Math.cos(angle)),
-                        centerPt.y + (legLength * Math.sin(angle)));
+                    const pt = new L.Point(centerPt.x + (legLength * Math.cos(angle)), centerPt.y + (legLength * Math.sin(angle)));
                     legLength += (this.twoPi * this.spiralLengthFactor) / angle;
                     result.push(pt);
                 }
@@ -502,7 +515,7 @@ function layerFactory(L) {
         },
 
         _trigger: function (event, ...args) {
-            // return (Array.from(this.listeners[event] != null ? this.listeners[event] : [])).map((func) => func(...Array.from(args || [])));
+            return (Array.from(this.listeners[event] != null ? this.listeners[event] : [])).map((func) => func(...Array.from(args || [])));
         },
 
         _drawImage: function (marker, pointPos) {
@@ -639,13 +652,12 @@ function layerFactory(L) {
 
                 if (event.type === "click") {
 
-                    var hasPopup = ret[0].data.getPopup();
-                    if (hasPopup) ret[0].data.openPopup();
+                    /*const hasPopup = ret[0].data.getPopup();
+                    if (hasPopup) ret[0].data.openPopup();*/
 
                     me._onClickListeners.forEach(function (listener) {
-                        if (me._processAllOnClickListeners) listener(event, ret);
+                        listener(event, ret);
                     });
-                    me._processAllOnClickListeners = true;
                 }
 
                 if (event.type === "mousemove") {
