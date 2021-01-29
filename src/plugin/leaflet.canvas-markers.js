@@ -191,10 +191,11 @@ function layerFactory(L) {
             return this;
         },
 
-        clearLayers: function () {
+        clearLayers: function (redraw= true) {
             this._latlngMarkers = null;
             this._markers = null;
-            this._redraw(true);
+            this._markersArray = [];
+            this._redraw(redraw);
         },
 
         spiderfy: function (marker) {
@@ -264,7 +265,6 @@ function layerFactory(L) {
                     }
                     this.removeLayer(marker);
                     marker.setLatLng(footLl);
-                    //marker.setZIndexOffset(1000000);
                     this.addMarker(marker);
                     result.push(marker);
                 }
@@ -698,6 +698,6 @@ function layerFactory(L) {
     L.canvasIconLayer = function (options) {
         return new CanvasIconLayer(options);
     };
-};
+}
 
 module.exports = layerFactory;
