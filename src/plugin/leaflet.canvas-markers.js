@@ -97,7 +97,6 @@ function layerFactory(L) {
 
             self._latlngMarkers.insert(dat[1]);
 
-
         },
 
         addLayer: function (layer) {
@@ -109,12 +108,10 @@ function layerFactory(L) {
         },
 
         addLayers: function (layers) {
-
             this.addMarkers(layers);
         },
 
         removeLayer: function (layer) {
-
             this.removeMarker(layer, true);
         },
 
@@ -152,7 +149,6 @@ function layerFactory(L) {
             self._latlngMarkers.dirty++;
 
             if (isDisplaying === true && redraw === true) {
-
                 self._redraw(true);
             }
         },
@@ -170,7 +166,7 @@ function layerFactory(L) {
             map.on('resize', this._reset, this);
 
             map.on('click', this._executeListeners, this);
-            //map.on('mousemove', this._executeListeners, this);
+            map.on('mousemove', this._executeListeners, this);
         },
 
         onRemove: function (map) {
@@ -179,7 +175,7 @@ function layerFactory(L) {
             else map.getPanes().overlayPane.removeChild(this._canvas);
 
             map.off('click', this._executeListeners, this);
-            //map.off('mousemove', this._executeListeners, this);
+            map.off('mousemove', this._executeListeners, this);
 
             map.off('moveend', this._reset, this);
             map.off('resize', this._reset, this);
@@ -207,10 +203,6 @@ function layerFactory(L) {
             const markerPt = map.latLngToLayerPoint(marker.getLatLng());
 
             for (let m of this._markersArray) {
-                /*if (!map.hasLayer(m)) {
-                    console.log('No layer');
-                    continue;
-                }*/
                 const mPt = map.latLngToLayerPoint(m.getLatLng());
 
                 if (canvasLayer.ptDistanceSq(mPt, markerPt) < pxSq) {
@@ -260,7 +252,6 @@ function layerFactory(L) {
                     if (this.legColors.highlighted !== this.legColors.usual) {
                         const mhl = this._makeHighlightListeners(marker);
                         marker.omsData.highlightListeners = mhl;
-                        marker.addEventListener('mouseover', mhl.highlight);
                         marker.addEventListener('mouseout', mhl.unhighlight);
                     }
                     this.removeLayer(marker);

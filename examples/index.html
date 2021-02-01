@@ -47,11 +47,6 @@
   var canvasLayer = L.canvasIconLayer({}).addTo(map);
 
   var popup = new L.Popup({closeButton: false});
-
-  canvasLayer.addOnClickListener(function (e, data) {
-    canvasLayer.spiderfy(data[0].data);
-  });
-
   canvasLayer.addListener('popup', (marker) => {
     popup.setContent('Hello');
     popup.setLatLng(marker.getLatLng());
@@ -70,8 +65,6 @@
   map.on('zoomend moveend', function (event) {
     canvasLayer.unspiderfy();
   });
-
-  // ciLayer.addOnHoverListener(function (e,data) {console.log(data[0].data._leaflet_id)});
 
   var icon = L.icon({
     iconUrl: 'img/pothole.png',
