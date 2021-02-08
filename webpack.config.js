@@ -6,7 +6,19 @@ const isProd = environment === "prod";
 
 const optimization = {
     minimize: isProd,
-    minimizer: [new TerserPlugin()]
+    minimizer: [
+        new TerserPlugin({
+            terserOptions: {
+                compress: {
+                    drop_console: true
+                },
+                format: {
+                    comments: false,
+                },
+            },
+            extractComments: false,
+        })
+    ]
 };
 
 const webpackConfig = {
