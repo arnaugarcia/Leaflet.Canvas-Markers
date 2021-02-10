@@ -47,6 +47,7 @@
   var canvasLayer = L.canvasIconLayer({}).addTo(map);
 
   var popup = new L.Popup({closeButton: false});
+
   canvasLayer.addListener('popup', (marker) => {
     popup.setContent('Hello');
     popup.setLatLng(marker.getLatLng());
@@ -54,8 +55,8 @@
     marker.openPopup();
   });
 
-  canvasLayer.addListener('spiderfy', function (event) {
-    console.log('Spiderfy', event);
+  canvasLayer.addOnClickListener(function (e, data) {
+    canvasLayer.spiderfy(data[0].data);
   });
 
   canvasLayer.addListener('unspiderfy', function (event) {
@@ -68,8 +69,8 @@
 
   var icon = L.icon({
     iconUrl: 'img/meteo-poi.png',
-    iconSize: [20, 18],
-    iconAnchor: [10, 9]
+    iconSize: [28, 30],
+    iconAnchor: [15, 14]
   });
 
   //let markers = [];
