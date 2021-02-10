@@ -212,12 +212,13 @@ function layerFactory(L) {
                 }
             }
             if (nearbyMarkerData.length === 1) {  // 1 => the one clicked => none nearby
-                console.log('Marker Alone');
                 this._trigger('popup', marker);
-                //return this._trigger('click', marker);
             } else {
+                const options = marker.options;
+                if (options && options.spiderfy === false ) {
+                    return this;
+                }
                 return this._spiderfy(nearbyMarkerData, nonNearbyMarkers);
-
             }
         },
 
