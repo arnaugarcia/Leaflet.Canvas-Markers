@@ -65,6 +65,8 @@
 
   map.on('zoomend moveend', function (event) {
     canvasLayer.unspiderfy();
+    canvasLayer.clearLayers(false);
+    setTimeout(drawMarkers, 1000);
   });
 
   var icon = L.icon({
@@ -73,14 +75,15 @@
     iconAnchor: [15, 14]
   });
 
-  //let markers = [];
-  for (var i = 0; i < 100; i++) {
-    const marker = L.marker([58.5578 + Math.random() * 1.8, 29.0087 + Math.random() * 3.6], {icon: icon});
-    //markers.push(marker);
-    canvasLayer.addMarker(marker)
+  function drawMarkers() {
+    for (var i = 0; i < 100; i++) {
+      const marker = L.marker([58.5578 + Math.random() * 1.8, 29.0087 + Math.random() * 3.6], {icon: icon});
+      //markers.push(marker);
+      canvasLayer.addMarker(marker)
+    }
   }
+  drawMarkers();
 
-  //canvasLayer.addMarkers(markers);
 
   // For debugging
   window.map = map;
